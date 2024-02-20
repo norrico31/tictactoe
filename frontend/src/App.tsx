@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 type Score = {
 	win: number
 	lose: number
+	draw: number
 }
 
 type Players = {
@@ -23,7 +24,6 @@ function App() {
 
 	const Reset = () => setReset(true)
 
-	console.log(players)
 	return (
 		<div className="App">
 			{!players ?
@@ -46,14 +46,14 @@ function App() {
 	);
 }
 
-const initNamesState = { player1: { name: '', score: { win: 0, lose: 0 } }, player2: { name: '', score: { win: 0, lose: 0 } } }
+const initNamesState = { player1: { name: '', score: { win: 0, lose: 0, draw: 0 } }, player2: { name: '', score: { win: 0, lose: 0, draw: 0 } } }
 const initErrorsState = { error1: '', error2: '' }
 
 function PlayersForm({ getPlayers }: { getPlayers: React.Dispatch<React.SetStateAction<Players>> }) {
 	const [names, setNames] = useState(initNamesState);
 	const [errors, setErrors] = useState(initErrorsState)
 
-	const inputChange = (e: any) => setNames({ ...names, [e.target.name]: { name: e.target.value, score: { win: 0, lose: 0 } } })
+	const inputChange = (e: any) => setNames({ ...names, [e.target.name]: { name: e.target.value, score: { win: 0, lose: 0, draw: 0 } } })
 
 	return <div style={{ padding: '3rem', border: '5px double #808080', }}>
 		<div style={{ display: 'flex', gap: '10rem' }}>
@@ -71,17 +71,17 @@ function PlayersForm({ getPlayers }: { getPlayers: React.Dispatch<React.SetState
 		<div style={{ display: 'grid', placeItems: 'center', marginTop: '2rem' }}>
 			<button style={{ textTransform: 'uppercase', letterSpacing: 1.2 }} onClick={() => {
 				setErrors(initErrorsState)
-				if (!names.player1 && !names.player2) {
+				if (!names.player1.name && !names.player2.name) {
 					setErrors({ error1: 'Please enter valid name', error2: 'Please enter valid name' })
 					return
 				}
-				else if (!names.player1 || names.player1?.name.length <= 2) {
+				else if (!names.player1.name || names.player1?.name.length <= 2) {
 					setErrors({ error2: '', error1: 'Please enter valid name for player 1' })
 					return
-				} else if (!names.player2 || names.player2?.name.length <= 2) {
+				} else if (!names.player2.name || names.player2?.name.length <= 2) {
 					setErrors({ error1: '', error2: 'Please enter valid name for player 2' })
 					return
-				} else if (names.player1 === names.player2) {
+				} else if (names.player1.name === names.player2.name) {
 					setErrors({ error1: 'Cannot use same player name', error2: 'Cannot use same player name' })
 					return
 				} else {
@@ -181,8 +181,34 @@ const Board = ({ reset, setReset, winner, setWinner, players }: any) => {
 const Players = ({ players }: { players: Players }) => {
 	return (
 		<div className='players'>
-			<div className='player'>{players?.player1?.name}: X</div>
-			<div className='player'>{players?.player2?.name}: O</div>
+			<div className='player' style={{ display: 'grid' }}>
+				{`${players?.player1?.name}: X`}
+				<div style={{ display: 'grid' }}>
+					<i>
+						Win: {players?.player1?.score.win}
+					</i>
+					<i>
+						Lose: {players?.player1?.score.lose}
+					</i>
+					<i>
+						Draw: {players?.player1?.score.draw}
+					</i>
+				</div>
+			</div>
+			<div className='player' style={{ display: 'grid' }}>
+				{`${players?.player2?.name}: O`}
+				<div style={{ display: 'grid' }}>
+					<i>
+						Win: {players?.player1?.score.win}
+					</i>
+					<i>
+						Lose: {players?.player1?.score.lose}
+					</i>
+					<i>
+						Draw: {players?.player1?.score.draw}
+					</i>
+				</div>
+			</div>
 		</div>
 	)
 }
