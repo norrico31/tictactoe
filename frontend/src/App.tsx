@@ -37,7 +37,10 @@ function App() {
 						reset={reset}
 						setReset={setReset}
 						players={players}
-						winner={winner} setWinner={setWinner} />
+						winner={winner} setWinner={setWinner}
+						setPlayers={setPlayers}
+					/>
+
 					<Players players={players} />
 				</>
 
@@ -104,13 +107,14 @@ const conditions = [
 	[2, 4, 6]
 ]
 
-const Board = ({ reset, setReset, winner, setWinner, players }: any) => {
+const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any) => {
 	const [data, setData] = useState(Array(9).fill(''))
 	const [current, setCurrent] = useState('X')
 
 	useEffect(() => {
 		if (reset) {
 			setData(Array(9).fill(''))
+			console.log(winner)
 			setWinner('')
 			setReset(false)
 		}
@@ -129,9 +133,43 @@ const Board = ({ reset, setReset, winner, setWinner, players }: any) => {
 
 			if (checkWin(board)) {
 				if (current === "X") {
-					setWinner(`${players.player1} wins`)
+					setWinner(`${players.player1.name} wins`)
+					setPlayers({
+						player1: {
+							name: players.player1.name,
+							score: {
+								...players.player1.score,
+								win: players.player1.score.win + 1,
+							}
+						},
+						player2: {
+							...players.player2,
+							score: {
+								...players.player2.score,
+								lose: players.player2.score.lose + 1,
+							}
+						},
+					})
+					return
 				} else {
-					setWinner(`${players.player2} wins`)
+					setWinner(`${players.player2.name} wins`)
+					setPlayers({
+						player1: {
+							name: players.player2.name,
+							score: {
+								...players.player1.score,
+								lose: players.player1.score.lose + 1,
+							}
+						},
+						player2: {
+							...players.player2,
+							score: {
+								...players.player2.score,
+								win: players.player2.score.win + 1,
+							}
+						},
+					})
+					return
 				}
 			}
 			if (checkDraw(board)) {
@@ -153,6 +191,7 @@ const Board = ({ reset, setReset, winner, setWinner, players }: any) => {
 			return false;
 		}
 	}
+
 	const checkWin = (board: any) => {
 		let flag = false;
 		conditions.forEach(element => {
@@ -167,6 +206,7 @@ const Board = ({ reset, setReset, winner, setWinner, players }: any) => {
 		})
 		return flag;
 	}
+
 	return (
 		<div className='board'>
 			{new Array(9).fill(undefined).map((_, idx) => (
@@ -182,7 +222,7 @@ const Players = ({ players }: { players: Players }) => {
 	return (
 		<div className='players'>
 			<div className='player' style={{ display: 'grid' }}>
-				{`${players?.player1?.name}: X`}
+				<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player1?.name}: X`}</p>
 				<div style={{ display: 'grid' }}>
 					<i>
 						Win: {players?.player1?.score.win}
@@ -196,7 +236,7 @@ const Players = ({ players }: { players: Players }) => {
 				</div>
 			</div>
 			<div className='player' style={{ display: 'grid' }}>
-				{`${players?.player2?.name}: O`}
+				<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player2?.name}: X`}</p>
 				<div style={{ display: 'grid' }}>
 					<i>
 						Win: {players?.player1?.score.win}

@@ -168,7 +168,7 @@ button:focus {
 }
 
 .player {
-	border: 2px solid #195ef4;
+	border: 2px solid rgb(173, 173, 173);
 	border-radius: 5%;
 	padding: .5rem 0;
 	display: flex;
