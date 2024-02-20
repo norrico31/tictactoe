@@ -18,7 +18,7 @@ body {
 	flex-direction: column;
 	gap: 5vh;
 	backdrop-filter: 5px;
-	background-color: #101010;
+	background-color: #f1f1f1;
 }
 
 .winner {
@@ -60,7 +60,7 @@ body {
 }
 
 button {
-	background-color: #111827;
+	background-color: #808080;
 	border: 1px solid transparent;
 	border-radius: .75rem;
 	box-sizing: border-box;
@@ -86,7 +86,7 @@ button {
 }
 
 button:hover {
-	background-color: #374151;
+	background-color: rgb(165, 167, 170)
 }
 
 button:focus {
@@ -97,7 +97,7 @@ button:focus {
 
 :root {
 	--board-background: none;
-	--border-color: #381bf7;
+	--border-color: #808080;
 	--border-thickness: 5px;
 }
 
@@ -125,39 +125,39 @@ button:focus {
 }
 
 .input1 {
-	border-right: var(--border-thickness) dashed var(--border-color);
-	border-bottom: var(--border-thickness) dashed var(--border-color);
+	border-right: var(--border-thickness) double var(--border-color);
+	border-bottom: var(--border-thickness) double var(--border-color);
 }
 
 .input2 {
-	border-right: var(--border-thickness) dashed var(--border-color);
-	border-bottom: var(--border-thickness) dashed var(--border-color);
+	border-right: var(--border-thickness) double var(--border-color);
+	border-bottom: var(--border-thickness) double var(--border-color);
 }
 
 .input3 {
-	border-bottom: var(--border-thickness) dashed var(--border-color);
+	border-bottom: var(--border-thickness) double var(--border-color);
 }
 
 .input4 {
-	border-right: var(--border-thickness) dashed var(--border-color);
-	border-bottom: var(--border-thickness) dashed var(--border-color);
+	border-right: var(--border-thickness) double var(--border-color);
+	border-bottom: var(--border-thickness) double var(--border-color);
 }
 
 .input5 {
-	border-right: var(--border-thickness) dashed var(--border-color);
-	border-bottom: var(--border-thickness) dashed var(--border-color);
+	border-right: var(--border-thickness) double var(--border-color);
+	border-bottom: var(--border-thickness) double var(--border-color);
 }
 
 .input6 {
-	border-bottom: var(--border-thickness) dashed var(--border-color);
+	border-bottom: var(--border-thickness) double var(--border-color);
 }
 
 .input7 {
-	border-right: var(--border-thickness) dashed var(--border-color);
+	border-right: var(--border-thickness) double var(--border-color);
 }
 
 .input8 {
-	border-right: var(--border-thickness) dashed var(--border-color);
+	border-right: var(--border-thickness) double var(--border-color);
 }
 
 .players {

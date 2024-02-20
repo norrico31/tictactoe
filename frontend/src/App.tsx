@@ -14,28 +14,28 @@ function App() {
 
 	return (
 		<div className="App">
-			<div style={{ padding: '3rem', border: '5px dashed #381bf7' }}>
+			<div style={{ padding: '3rem', border: '5px double #808080', }}>
 				<div style={{ display: 'flex', gap: '10rem' }}>
 					<div style={{ display: 'grid', gap: 5 }}>
-						<label htmlFor="player1" style={{ color: '#fff', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 1</label>
-						<input type="text" id="player1" placeholder="Enter Name..." />
+						<label htmlFor="player1" style={{ color: '#6b6b6b', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 1</label>
+						<input type="text" id="player1" placeholder="Enter Name..." style={{ padding: '.5rem', fontSize: '1.1rem', borderRadius: '5%', color: '#6b6b6b' }} />
 					</div>
 					<div style={{ display: 'grid', gap: 5 }}>
-						<label htmlFor="player2" style={{ color: '#fff', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 2</label>
-						<input type="text" id="player2" placeholder="Enter Name..." />
+						<label htmlFor="player2" style={{ color: '#808080', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 2</label>
+						<input type="text" id="player2" placeholder="Enter Name..." style={{ padding: '.5rem', fontSize: '1.1rem', borderRadius: '5%', color: '#6b6b6b' }} />
 					</div>
 				</div>
 				<div style={{ display: 'grid', placeItems: 'center', marginTop: '2rem' }}>
-					<button>Play Game</button>
+					<button>Start Game</button>
 				</div>
 			</div>
-			{/* <div className={`winner ${winner !== "" ? "" : "shrink"}`}>
+			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
 				<div className="winner-text">{winner}</div>
 				<button onClick={Reset}>Reset</button>
 			</div>
 			<Board reset={reset} setReset={setReset}
 				winner={winner} setWinner={setWinner} />
-			<Players players={players} /> */}
+			<Players players={players} />
 		</div>
 	);
 }
