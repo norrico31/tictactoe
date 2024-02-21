@@ -121,6 +121,7 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 	}, [reset, setReset, setWinner, winner])
 
 	const Draw = (index: number) => {
+		if (winner) return
 		if (data[index] === "") {
 			const board = data;
 			board[index] = current;
@@ -174,6 +175,22 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 			}
 			if (checkDraw(board)) {
 				setWinner("Draw")
+				setPlayers({
+					player1: {
+						name: players.player2.name,
+						score: {
+							...players.player1.score,
+							draw: players.player1.score.draw + 1
+						}
+					},
+					player2: {
+						...players.player2,
+						score: {
+							...players.player2.score,
+							draw: players.player2.score.draw + 1
+						}
+					},
+				})
 			}
 		}
 	}
@@ -239,13 +256,13 @@ const Players = ({ players }: { players: Players }) => {
 				<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player2?.name}: X`}</p>
 				<div style={{ display: 'grid' }}>
 					<i>
-						Win: {players?.player1?.score.win}
+						Win: {players?.player2?.score.win}
 					</i>
 					<i>
-						Lose: {players?.player1?.score.lose}
+						Lose: {players?.player2?.score.lose}
 					</i>
 					<i>
-						Draw: {players?.player1?.score.draw}
+						Draw: {players?.player2?.score.draw}
 					</i>
 				</div>
 			</div>
