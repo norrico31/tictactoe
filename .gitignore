@@ -6,3 +6,4 @@
 /frontend./dist-ssr
 /backend./dist-ssr
 *.local
+/backend/.env
