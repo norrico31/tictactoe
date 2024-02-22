@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import axios from "axios";
 
 const BASE_URL = `http://127.0.0.1:5000`
 
@@ -19,7 +20,7 @@ type Players = {
 		name: string
 		score: Score
 	};
-} & Partial<{ id: string; createdAt: string; updatedAt: string; rounds: number; draw: number }> | undefined
+} & Partial<{ _id: string; createdAt: string; updatedAt: string; rounds: number; draw: number }> | undefined
 
 function App() {
 	const [reset, setReset] = useState(false)
@@ -147,13 +148,15 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 
 	if (!id) return <Navigate to='/register' />
 
+	const resetGame = () => {
+		setData(Array(9).fill(''))
+		console.log(winner)
+		setWinner('')
+		setReset(false)
+	}
+
 	useEffect(() => {
-		if (reset) {
-			setData(Array(9).fill(''))
-			console.log(winner)
-			setWinner('')
-			setReset(false)
-		}
+		if (reset) resetGame
 	}, [reset, setReset, setWinner, winner])
 
 	useEffect(() => {
@@ -161,18 +164,15 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 
 		(async () => {
 			try {
-				alert()
-				const res = await fetch(`${BASE_URL}/api/player/` + id, { method: 'GET', headers: { 'Content-type': 'application/json' } });
+				const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'GET' })
+				console.log(res)
 				const data = await res.json()
-				// if (!cleanUp) {
-				// 	setPlayers(data)
-				// }
-				console.log(data)
+				// setPlayers(data)
 			} catch (error) {
 				return error
 			}
 		})()
-	}, [])
+	}, [id])
 
 	const Draw = (index: number) => {
 		if (winner) return
@@ -282,7 +282,7 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 		<div className="App">
 			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
 				<div className="winner-text">{winner}</div>
-				<button onClick={reset}>Reset</button>
+				<button onClick={resetGame}>Reset</button>
 			</div>
 			<div className='board'>
 				{new Array(9).fill(undefined).map((_, idx) => (
@@ -297,6 +297,24 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 }
 
 const PlayersLists = () => {
+	const [lists, setLists] = useState<Players[]>([])
+	useEffect(() => {
+		let cleanUp = false;
+		(async () => {
+			try {
+				const res = await fetch(`${BASE_URL}/api/players`, { method: 'GET' })
+				const data = await res.json()
+				if (!cleanUp) setLists(data ?? [])
+
+			} catch (error) {
+				return error
+			}
+		})()
+		return () => {
+			cleanUp = true
+		}
+	}, [])
+	console.log(lists)
 	return <>
 		<h1 style={{ color: '#525252', textAlign: 'center' }}>Tic Tac Toe Scoring Board</h1>
 		<div style={{ textAlign: 'right', padding: 10 }}>
@@ -315,17 +333,19 @@ const PlayersLists = () => {
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td>Alfreds Futterkiste</td>
-					<td>Maria Anders</td>
-					<td>10</td>
-					<td>4</td>
-					<td>4</td>
-					<td>2</td>
-					<td >
-						<button onClick={() => alert('func for rematch')}>Rematch</button>
-					</td>
-				</tr>
+				{lists.map((player: Players) => (
+					<tr key={player?._id}>
+						<td>{player?.player1.name}</td>
+						<td>{player?.player2.name}</td>
+						<td>10</td>
+						<td>4</td>
+						<td>4</td>
+						<td>2</td>
+						<td >
+							<button onClick={() => alert('func for rematch')}>Rematch</button>
+						</td>
+					</tr>
+				))}
 				<tr>
 					{/* <td>Berglunds snabbköp</td>
 					<td>Christina Berglund</td>

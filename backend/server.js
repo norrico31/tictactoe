@@ -8,7 +8,10 @@ const app = express()
 dotenv.config()
 db();
 
-app.use(cors({origin: 'http://localhost:5173'}))
+app.use(cors({
+    origin: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+}))
 
 app.use(express.json())
 

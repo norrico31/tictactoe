@@ -34,16 +34,18 @@ export const createPlayers = async (req, res) => {
 export const getAllPlayers = async (req, res) => {
     try {
         const players = await PlayerModel.find({})
-        return res.json(players)
+        console.log(players)
+        return res.status(200).json(players)
     } catch (error) {
         return error
     }
 }
 
-export const getPlayers = async (req, res) => {
+export const getPlayersById = async (req, res) => {
     try {
-        console.log(req)
-        return res.status(200).json({msg: 'aha'})
+        const res = await PlayerModel.findById(req.params.id)
+        console.log(res)
+        return res.status(200).json(res)
     } catch (error) {
         return error
     }
