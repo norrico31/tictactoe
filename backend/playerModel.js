@@ -1,8 +1,7 @@
 
 import mongoose from "mongoose";
 
-
-export default mongoose.model('Player', mongoose.Schema({
+const playersSchema = new mongoose.Schema({
     player1: {
         name: String,
         score: {
@@ -19,4 +18,8 @@ export default mongoose.model('Player', mongoose.Schema({
             draw: Number,
         }
     }
-}, { timeStamps: true}))
+}, {timestamps: true})
+
+const Players = mongoose.model('Player', playersSchema)
+
+export default Players

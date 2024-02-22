@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const BASE_URL = `http://127.0.0.1:5000`
+
 type Score = {
 	win: number
 	lose: number
@@ -15,7 +17,7 @@ type Players = {
 		name: string
 		score: Score
 	};
-} | undefined
+} & Partial<{ id: string; createdAt: string; updatedAt: string; }> | undefined
 
 function App() {
 	const [reset, setReset] = useState(false)
@@ -72,7 +74,7 @@ function PlayersForm({ getPlayers }: { getPlayers: React.Dispatch<React.SetState
 			</div>
 		</div>
 		<div style={{ display: 'grid', placeItems: 'center', marginTop: '2rem' }}>
-			<button style={{ textTransform: 'uppercase', letterSpacing: 1.2 }} onClick={() => {
+			<button style={{ textTransform: 'uppercase', letterSpacing: 1.2 }} onClick={async () => {
 				setErrors(initErrorsState)
 				if (!names.player1.name && !names.player2.name) {
 					setErrors({ error1: 'Please enter valid name', error2: 'Please enter valid name' })
@@ -88,8 +90,16 @@ function PlayersForm({ getPlayers }: { getPlayers: React.Dispatch<React.SetState
 					setErrors({ error1: 'Cannot use same player name', error2: 'Cannot use same player name' })
 					return
 				} else {
-					getPlayers({ ...names! })
+					// getPlayers({ ...names! })
 					setErrors(initErrorsState)
+					try {
+						const players = { player1: names.player1.name, player2: names.player2.name }
+						const res = await fetch(`${BASE_URL}/api/players`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(players) })
+						const data = await res.json()
+						console.log('frontened res: ', data)
+					} catch (error) {
+						console.log('frontned error: ', error)
+					}
 				}
 			}}>Start Game</button>
 		</div>

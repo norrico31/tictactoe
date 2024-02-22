@@ -1,11 +1,14 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors'
 import db from './db.js'
 import playerRoutes from './playerRoutes.js'
 
 const app = express()
 dotenv.config()
 db();
+
+app.use(cors({origin: 'http://localhost:5173'}))
 
 app.use(express.json())
 
