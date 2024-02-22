@@ -42,7 +42,8 @@ export const getAllPlayers = async (req, res) => {
 
 export const getPlayers = async (req, res) => {
     try {
-        
+        console.log(req)
+        return res.status(200).json({msg: 'aha'})
     } catch (error) {
         return error
     }

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 const BASE_URL = `http://127.0.0.1:5000`
 
@@ -27,14 +29,29 @@ function App() {
 	const Reset = () => setReset(true)
 
 	return (
-		<div className="App">
+		<Router basename="/" future={{ v7_startTransition: true }}>
+			<Routes>
+				<Route path="/" element={<PlayersLists />} />
+				<Route path="/register" element={
+					<PlayersForm
+
+						players={players}
+						getPlayers={setPlayers}
+
+					/>} />
+				<Route path="/playgame/:id" element={
+					<Board
+						reset={reset}
+						setReset={setReset}
+						players={players}
+						winner={winner} setWinner={setWinner}
+						setPlayers={setPlayers}
+					/>} />
+			</Routes>
 			{/* {!players ?
 				<PlayersForm getPlayers={setPlayers} />
 				: <>
-					<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
-						<div className="winner-text">{winner}</div>
-						<button onClick={Reset}>Reset</button>
-					</div>
+					
 					<Board
 						reset={reset}
 						setReset={setReset}
@@ -43,65 +60,72 @@ function App() {
 						setPlayers={setPlayers}
 					/>
 
-					<Players players={players} />
+					
 				</>
 			} */}
-			<PlayersLists />
-		</div>
+		</Router>
 	);
 }
 
 const initNamesState = { player1: { name: '', score: { win: 0, lose: 0, draw: 0 } }, player2: { name: '', score: { win: 0, lose: 0, draw: 0 } } }
 const initErrorsState = { error1: '', error2: '' }
 
-function PlayersForm({ getPlayers }: { getPlayers: React.Dispatch<React.SetStateAction<Players>> }) {
+function PlayersForm({ players }: { players: Players; getPlayers: React.Dispatch<React.SetStateAction<Players>> }) {
 	const [names, setNames] = useState(initNamesState);
 	const [errors, setErrors] = useState(initErrorsState)
+	const navigate = useNavigate()
+
+	if (players) return <Navigate to='/playgame' />
 
 	const inputChange = (e: any) => setNames({ ...names, [e.target.name]: { name: e.target.value, score: { win: 0, lose: 0, draw: 0 } } })
 
-	return <div style={{ padding: '3rem', border: '5px double #808080', }}>
-		<div style={{ display: 'flex', gap: '10rem' }}>
-			<div style={{ display: 'grid', gap: 5 }}>
-				<label htmlFor="player1" style={{ color: '#6b6b6b', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 1</label>
-				<input type="text" id="player1" placeholder="Enter Name..." style={{ padding: '.5rem', fontSize: '1.1rem', borderRadius: '5%', color: '#6b6b6b' }} name='player1' value={names?.player1?.name} onChange={inputChange} />
-				<p style={{ color: 'red', margin: 0 }}>{errors?.error1 !== '' && errors?.error1}</p>
-			</div>
-			<div style={{ display: 'grid', gap: 5 }}>
-				<label htmlFor="player2" style={{ color: '#808080', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 2</label>
-				<input type="text" id="player2" placeholder="Enter Name..." style={{ padding: '.5rem', fontSize: '1.1rem', borderRadius: '5%', color: '#6b6b6b' }} name='player2' value={names?.player2?.name} onChange={inputChange} />
-				<p style={{ color: 'red', margin: 0 }}>{errors?.error2 !== '' && errors?.error2}</p>
-			</div>
-		</div>
-		<div style={{ display: 'grid', placeItems: 'center', marginTop: '2rem' }}>
-			<button style={{ textTransform: 'uppercase', letterSpacing: 1.2 }} onClick={async () => {
-				setErrors(initErrorsState)
-				if (!names.player1.name && !names.player2.name) {
-					setErrors({ error1: 'Please enter valid name', error2: 'Please enter valid name' })
-					return
-				}
-				else if (!names.player1.name || names.player1?.name.length <= 2) {
-					setErrors({ error2: '', error1: 'Please enter valid name for player 1' })
-					return
-				} else if (!names.player2.name || names.player2?.name.length <= 2) {
-					setErrors({ error1: '', error2: 'Please enter valid name for player 2' })
-					return
-				} else if (names.player1.name === names.player2.name) {
-					setErrors({ error1: 'Cannot use same player name', error2: 'Cannot use same player name' })
-					return
-				} else {
+	return <div style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
+		<div style={{ padding: '3rem', border: '5px double #808080', }}>
+			<Link to='/' style={{ fontSize: 24, color: '#575757' }}>Back to score board</Link>
+			<h1 style={{ textAlign: 'center' }}>Register Players</h1>
+			<div style={{ display: 'flex', justifyContent: 'center', gap: '10rem' }}>
+				<div style={{ display: 'grid', gap: 5 }}>
+					<label htmlFor="player1" style={{ color: '#6b6b6b', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 1</label>
+					<input type="text" id="player1" placeholder="Enter Name..." style={{ padding: '.5rem', fontSize: '1.1rem', borderRadius: '5%', color: '#6b6b6b' }} name='player1' value={names?.player1?.name} onChange={inputChange} />
+					<p style={{ color: 'red', margin: 0 }}>{errors?.error1 !== '' && errors?.error1}</p>
+				</div>
+				<div style={{ display: 'grid', gap: 5 }}>
+					<label htmlFor="player2" style={{ color: '#808080', fontSize: '1.4rem', fontWeight: 'bold' }}>Player 2</label>
+					<input type="text" id="player2" placeholder="Enter Name..." style={{ padding: '.5rem', fontSize: '1.1rem', borderRadius: '5%', color: '#6b6b6b' }} name='player2' value={names?.player2?.name} onChange={inputChange} />
+					<p style={{ color: 'red', margin: 0 }}>{errors?.error2 !== '' && errors?.error2}</p>
+				</div>
+			</div >
+			<div style={{ display: 'grid', placeItems: 'center', marginTop: '2rem' }}>
+				<button style={{ textTransform: 'uppercase', letterSpacing: 1.2 }} onClick={async () => {
 					setErrors(initErrorsState)
-					try {
-						const players = { player1: names.player1.name, player2: names.player2.name }
-						const res = await fetch(`${BASE_URL}/api/players`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(players) })
-						const data = await res.json()
-						getPlayers({ ...data! })
-					} catch (error) {
-						console.log('frontned error: ', error)
+					if (!names.player1.name && !names.player2.name) {
+						setErrors({ error1: 'Please enter valid name', error2: 'Please enter valid name' })
+						return
 					}
-				}
-			}}>Start Game</button>
-		</div>
+					else if (!names.player1.name || names.player1?.name.length <= 2) {
+						setErrors({ error2: '', error1: 'Please enter valid name for player 1' })
+						return
+					} else if (!names.player2.name || names.player2?.name.length <= 2) {
+						setErrors({ error1: '', error2: 'Please enter valid name for player 2' })
+						return
+					} else if (names.player1.name === names.player2.name) {
+						setErrors({ error1: 'Cannot use same player name', error2: 'Cannot use same player name' })
+						return
+					} else {
+						setErrors(initErrorsState)
+						try {
+							const players = { player1: names.player1.name, player2: names.player2.name }
+							const res = await fetch(`${BASE_URL}/api/players`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(players) }) as any
+							const data = await res.json()
+							navigate('/playgame/' + data?._id!)
+							localStorage.setItem('id', JSON.stringify(data?._id))
+						} catch (error) {
+							console.log('frontned error: ', error)
+						}
+					}
+				}}>Start Game</button>
+			</div>
+		</div >
 	</div>
 }
 
@@ -119,6 +143,9 @@ const conditions = [
 const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any) => {
 	const [data, setData] = useState(Array(9).fill(''))
 	const [current, setCurrent] = useState('X')
+	const { id } = useParams()
+
+	if (!id) return <Navigate to='/register' />
 
 	useEffect(() => {
 		if (reset) {
@@ -128,6 +155,24 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 			setReset(false)
 		}
 	}, [reset, setReset, setWinner, winner])
+
+	useEffect(() => {
+		let cleanUp = false;
+
+		(async () => {
+			try {
+				alert()
+				const res = await fetch(`${BASE_URL}/api/player/` + id, { method: 'GET', headers: { 'Content-type': 'application/json' } });
+				const data = await res.json()
+				// if (!cleanUp) {
+				// 	setPlayers(data)
+				// }
+				console.log(data)
+			} catch (error) {
+				return error
+			}
+		})()
+	}, [])
 
 	const Draw = (index: number) => {
 		if (winner) return
@@ -234,18 +279,29 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 	}
 
 	return (
-		<div className='board'>
-			{new Array(9).fill(undefined).map((_, idx) => (
-				<div className={`input input${idx + 1}`} key={idx}
-					onClick={() => Draw(idx)}>{data[idx]}
-				</div>
-			))}
+		<div className="App">
+			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
+				<div className="winner-text">{winner}</div>
+				<button onClick={reset}>Reset</button>
+			</div>
+			<div className='board'>
+				{new Array(9).fill(undefined).map((_, idx) => (
+					<div className={`input input${idx + 1}`} key={idx}
+						onClick={() => Draw(idx)}>{data[idx]}
+					</div>
+				))}
+			</div>
+			<Players players={players} />
 		</div>
 	)
 }
 
 const PlayersLists = () => {
 	return <>
+		<h1 style={{ color: '#525252', textAlign: 'center' }}>Tic Tac Toe Scoring Board</h1>
+		<div style={{ textAlign: 'right', padding: 10 }}>
+			<Link to='/register' style={{ fontSize: 32, fontWeight: 'bold', color: '#525252' }}>Play Game</Link>
+		</div >
 		<table id="player-lists" style={{ textAlign: 'center' }}>
 			<thead >
 				<tr >

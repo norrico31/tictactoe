@@ -1,9 +1,10 @@
 import express from 'express'
-import { getPlayers, createPlayers } from './playerController.js'
+import {getAllPlayers, getPlayers, createPlayers } from './playerController.js'
 
 const router = express.Router()
 
 
-router.route('/').post(createPlayers).get(getPlayers)
+router.route('/').post(createPlayers).get(getAllPlayers)
+router.route('/:id').get(getPlayers)
 
 export default router
