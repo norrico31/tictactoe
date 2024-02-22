@@ -6,12 +6,13 @@ export const createPlayers = async (req, res) => {
         const player2 = req.body.player2
         if (!player1 || !player2) return res.status(400).json({message: 'Please enter player names'})
         const players = {
+            rounds: 0,
+            draw: 0,
             player1: {
                 name: player1,
                 score: {
                     win: 0,
                     lose: 0,
-                    draw: 0
                 }
             },
             player2: {
@@ -19,7 +20,6 @@ export const createPlayers = async (req, res) => {
                 score: {
                     win: 0,
                     lose: 0,
-                    draw: 0
                 }
             }
         }

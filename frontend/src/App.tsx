@@ -5,10 +5,10 @@ const BASE_URL = `http://127.0.0.1:5000`
 type Score = {
 	win: number
 	lose: number
-	draw: number
 }
 
 type Players = {
+
 	player1: {
 		name: string
 		score: Score
@@ -17,7 +17,7 @@ type Players = {
 		name: string
 		score: Score
 	};
-} & Partial<{ id: string; createdAt: string; updatedAt: string; }> | undefined
+} & Partial<{ id: string; createdAt: string; updatedAt: string; rounds: number; draw: number }> | undefined
 
 function App() {
 	const [reset, setReset] = useState(false)
@@ -28,7 +28,7 @@ function App() {
 
 	return (
 		<div className="App">
-			{!players ?
+			{/* {!players ?
 				<PlayersForm getPlayers={setPlayers} />
 				: <>
 					<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
@@ -45,8 +45,8 @@ function App() {
 
 					<Players players={players} />
 				</>
-
-			}
+			} */}
+			<PlayersLists />
 		</div>
 	);
 }
@@ -90,13 +90,12 @@ function PlayersForm({ getPlayers }: { getPlayers: React.Dispatch<React.SetState
 					setErrors({ error1: 'Cannot use same player name', error2: 'Cannot use same player name' })
 					return
 				} else {
-					// getPlayers({ ...names! })
 					setErrors(initErrorsState)
 					try {
 						const players = { player1: names.player1.name, player2: names.player2.name }
 						const res = await fetch(`${BASE_URL}/api/players`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(players) })
 						const data = await res.json()
-						console.log('frontened res: ', data)
+						getPlayers({ ...data! })
 					} catch (error) {
 						console.log('frontned error: ', error)
 					}
@@ -245,6 +244,42 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 	)
 }
 
+const PlayersLists = () => {
+	return <>
+		<table id="player-lists" style={{ textAlign: 'center' }}>
+			<thead >
+				<tr >
+					<th>Player 1</th>
+					<th>Player 2</th>
+					<th>Rounds</th>
+					<th>Win</th>
+					<th>Lose</th>
+					<th>Draw</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Alfreds Futterkiste</td>
+					<td>Maria Anders</td>
+					<td>10</td>
+					<td>4</td>
+					<td>4</td>
+					<td>2</td>
+					<td >
+						<button onClick={() => alert('func for rematch')}>Rematch</button>
+					</td>
+				</tr>
+				<tr>
+					{/* <td>Berglunds snabbköp</td>
+					<td>Christina Berglund</td>
+					<td>Sweden</td> */}
+				</tr>
+			</tbody>
+		</table>
+	</>
+}
+
 const Players = ({ players }: { players: Players }) => {
 	return (
 		<div className='players'>
@@ -258,7 +293,7 @@ const Players = ({ players }: { players: Players }) => {
 						Lose: {players?.player1?.score.lose}
 					</i>
 					<i>
-						Draw: {players?.player1?.score.draw}
+						Draw: {players?.draw ?? 0}
 					</i>
 				</div>
 			</div>
@@ -272,7 +307,7 @@ const Players = ({ players }: { players: Players }) => {
 						Lose: {players?.player2?.score.lose}
 					</i>
 					<i>
-						Draw: {players?.player2?.score.draw}
+						Draw: {players?.draw ?? 0}
 					</i>
 				</div>
 			</div>

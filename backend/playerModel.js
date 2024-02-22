@@ -2,6 +2,7 @@
 import mongoose from "mongoose";
 
 const playersSchema = new mongoose.Schema({
+    rounds: Number,
     player1: {
         name: String,
         score: {
