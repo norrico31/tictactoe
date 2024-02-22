@@ -92,3 +92,25 @@ export const updatePlayers = async (req, res) => {
             return error
     }
 }
+
+export const clearGameData = async (req, res) => {
+    try {
+        const id = req.params.id
+        const existingRecord = await PlayerModel.findById(id)
+        if (!existingRecord) return res.status(400).json({message: 'No Record Found'})
+
+        existingRecord.rounds = 1;
+        existingRecord.draw = 0;
+        existingRecord.player1.name = existingRecord.player1.name;
+        existingRecord.player1.score.win = 0;
+        existingRecord.player1.score.lose = 0;
+
+        existingRecord.player2.name = existingRecord.player2.name;
+        existingRecord.player2.score.win = 0;
+        existingRecord.player2.score.lose = 0;
+        await existingRecord.save()
+        return res.json(existingRecord)
+    } catch (error) {
+        return error
+    }
+}

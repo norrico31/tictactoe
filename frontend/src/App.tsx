@@ -41,6 +41,10 @@ function PlayersForm() {
 	const [errors, setErrors] = useState(initErrorsState)
 	const navigate = useNavigate()
 
+	const id = JSON.parse(localStorage.getItem('id')!)
+
+	if (id) return <Navigate to={'/playgame/' + id} />
+
 	const inputChange = (e: any) => setNames({ ...names, [e.target.name]: { name: e.target.value, score: { win: 0, lose: 0, draw: 0 } } })
 
 	return <div style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
@@ -149,8 +153,7 @@ const Board = ({ }: any) => {
 
 	async function updateMatchPlayer(id: string, winner: 'player1' | 'player2' | 'draw') {
 		try {
-			const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ winner }) }) as any
-			console.log('res from frontend: ', res)
+			await fetch(`${BASE_URL}/api/players/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ winner }) }) as any
 		} catch (error) {
 			return error
 		}
@@ -210,11 +213,11 @@ const Board = ({ }: any) => {
 			</div>
 			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
 				<div className="winner-text">{winner}</div>
-				<button onClick={() => {
+				<button disabled={loading} onClick={() => {
 					if (loading) return
 					resetGame()
 				}}>Next Round</button>
-				<button onClick={() => {
+				<button disabled={loading} onClick={() => {
 					localStorage.clear()
 					navigate('/')
 				}}>Stop Game</button>
@@ -226,7 +229,7 @@ const Board = ({ }: any) => {
 					</div>
 				))}
 			</div>
-			<Players players={players} resetGame={resetGame} />
+			<Players players={players} resetGame={resetGame} loading={loading} />
 		</div>
 	)
 }
@@ -295,7 +298,7 @@ const PlayersLists = () => {
 	</>
 }
 
-const Players = ({ players, resetGame }: any) => {
+const Players = ({ players, resetGame, loading }: any) => {
 	const navigate = useNavigate()
 	return (
 		<div style={{ display: 'grid', gap: 5 }}>
@@ -329,16 +332,21 @@ const Players = ({ players, resetGame }: any) => {
 				</div>
 			</div>
 			<div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-				<button onClick={() => {
+				<button disabled={loading} onClick={() => {
 					if (confirm('Are you sure you want to stop the current game?')) {
 						localStorage.clear()
 						navigate('/')
 					}
 				}}>Stop Game</button>
-				<button onClick={resetGame}>Restart Game</button>
-				<button onClick={() => {
+				<button disabled={loading} onClick={resetGame}>Restart Game</button>
+				<button disabled={loading} onClick={async () => {
 					if (confirm('Are you sure you want to clear game data?')) {
-
+						try {
+							await fetch(`${BASE_URL}/api/players/${players?._id}/clear`, { method: 'PUT' })
+							resetGame()
+						} catch (error) {
+							return error
+						}
 					}
 				}}>Clear Game Record</button>
 			</div>
