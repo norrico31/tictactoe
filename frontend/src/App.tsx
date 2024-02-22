@@ -46,21 +46,6 @@ function App() {
 						winner={winner} setWinner={setWinner}
 					/>} />
 			</Routes>
-			{/* {!players ?
-				<PlayersForm getPlayers={setPlayers} />
-				: <>
-					
-					<Board
-						reset={reset}
-						setReset={setReset}
-						players={players}
-						winner={winner} setWinner={setWinner}
-						setPlayers={setPlayers}
-					/>
-
-					
-				</>
-			} */}
 		</Router>
 	);
 }
@@ -297,6 +282,7 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 
 	return (
 		<div className="App">
+			<h1 style={{ fontSize: 60 }}>Round: {players?.rounds}</h1>
 			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
 				<div className="winner-text">{winner}</div>
 				<button onClick={resetGame}>Reset</button>
@@ -378,33 +364,34 @@ const PlayersLists = () => {
 
 const Players = ({ players }: { players: Players }) => {
 	return (
-		<div className='players'>
-			<div className='player' style={{ display: 'grid' }}>
-				<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player1?.name}: X`}</p>
-				<div style={{ display: 'grid' }}>
-					<i>
-						Win: {players?.player1?.score.win}
-					</i>
-					<i>
-						Lose: {players?.player1?.score.lose}
-					</i>
-					<i>
-						Draw: {players?.draw ?? 0}
-					</i>
+		<div>
+			<div className='players' style={{ marginBottom: 10 }}>
+				<div className='player' style={{ display: 'grid' }}>
+					<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player1?.name}: X`}</p>
+					<div style={{ display: 'grid' }}>
+						<i>
+							Win: {players?.player1?.score.win}
+						</i>
+						<i>
+							Lose: {players?.player1?.score.lose}
+						</i>
+					</div>
+				</div>
+				<div className='player' style={{ display: 'grid' }}>
+					<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player2?.name}: X`}</p>
+					<div style={{ display: 'grid' }}>
+						<i>
+							Win: {players?.player2?.score.win}
+						</i>
+						<i>
+							Lose: {players?.player2?.score.lose}
+						</i>
+					</div>
 				</div>
 			</div>
-			<div className='player' style={{ display: 'grid' }}>
-				<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player2?.name}: X`}</p>
-				<div style={{ display: 'grid' }}>
-					<i>
-						Win: {players?.player2?.score.win}
-					</i>
-					<i>
-						Lose: {players?.player2?.score.lose}
-					</i>
-					<i>
-						Draw: {players?.draw ?? 0}
-					</i>
+			<div style={{ display: 'grid', placeItems: 'center' }}>
+				<div className="player" style={{ width: '60%' }}>
+					Draw: {players?.draw ?? 0}
 				</div>
 			</div>
 		</div>

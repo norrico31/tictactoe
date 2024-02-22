@@ -66,7 +66,7 @@ export const updatePlayers = async (req, res) => {
 
             existingGamePlay.player2.name = existingGamePlay.player2.name;
             existingGamePlay.player2.score.win = existingGamePlay.player2.score.win;
-            existingGamePlay.player2.score.lose = existingGamePlay.player2.score.lose === 0 ? 0 : (existingGamePlay.player2.score.lose + 1);
+            existingGamePlay.player2.score.lose = existingGamePlay.player2.score.lose + 1;
         }
         else if (winner === 'player2') {
             console.log('player2')
@@ -74,7 +74,7 @@ export const updatePlayers = async (req, res) => {
             existingGamePlay.draw = existingGamePlay.draw;
             existingGamePlay.player1.name = existingGamePlay.player1.name;
             existingGamePlay.player1.score.win = existingGamePlay.player1.score.win;
-            existingGamePlay.player1.score.lose = existingGamePlay.player1.score.lose === 0 ? 0 : existingGamePlay.player1.score.lose;
+            existingGamePlay.player1.score.lose = existingGamePlay.player1.score.lose + 1;
             
             existingGamePlay.player2.name = existingGamePlay.player2.name;
             existingGamePlay.player2.score.win = existingGamePlay.player2.score.win + 1;
@@ -90,56 +90,5 @@ export const updatePlayers = async (req, res) => {
         return res.json(existingGamePlay)
     } catch (error) {
             return error
-    }
-}
-
-function roundWinner(winner, existingGamePlay) {
-    switch (winner) {
-        case 'player1': 
-            return {
-                draw: existingGamePlay.draw,
-                rounds: existingGamePlay.rounds + 1,
-                player1: {
-                    name: existingGamePlay.player1.name,
-                    score: {
-                        lose: existingGamePlay.player1.score.lose,
-                        win: existingGamePlay.player1.score.win + 1
-                    }
-                },
-                player2: {
-                    name: existingGamePlay.player2.name,
-                    score: {
-                        lose: existingGamePlay.player2.score.lose === 0 ? 0 : (existingGamePlay.player2.score.lose + 1),
-                        win: existingGamePlay.player2.score.win
-                    }
-                },
-            }
-        case 'player2':
-                return {
-                    draw: existingGamePlay.draw,
-                    rounds: existingGamePlay.rounds + 1,
-                    player1: {
-                    name: existingGamePlay.player1.name,
-                    score: {
-                        lose: existingGamePlay.player1.score.lose === 0 ? 0 : (existingGamePlay.player1.score.lose + 1),
-                        win: existingGamePlay.player1.score.win + 1
-                    }
-                    },
-                    player2: {
-                        name: existingGamePlay.player2.name,
-                        score: {
-                            lose: existingGamePlay.player2.score.lose,
-                            win: existingGamePlay.player2.score.win + 1
-                        }
-                    },
-                }
-        case 'draw': 
-                return {
-                    ...existingGamePlay,
-                    rounds: existingGamePlay.rounds + 1,
-                    draw: existingGamePlay.draw + 1,
-                }
-        default: winner
-                
     }
 }

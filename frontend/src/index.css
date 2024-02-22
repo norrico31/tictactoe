@@ -11,17 +11,17 @@ body {
 }
 #root {
 	min-height: 100vh;
+	background-color: #f1f1f1;
 }
 .App {
 	width: 100vw;
-	height: 100vh;
+	height: 90vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
-	gap: 5vh;
+	gap: 2;
 	backdrop-filter: 5px;
-	background-color: #f1f1f1;
 }
 
 .winner {
@@ -106,7 +106,7 @@ button:focus {
 }
 
 .board {
-	width: 30vw;
+	width: 60vw;
 	height: 50%;
 	background-color: var(--board-background);
 	display: flex;
@@ -163,7 +163,7 @@ button:focus {
 }
 
 .players {
-	width: 40vw;
+	width: 60vw;
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
@@ -178,7 +178,7 @@ button:focus {
 	font-size: 1.5rem;
 	justify-content: center;
 	align-items: center;
-	width: 15vw;
+	width: 25vw;
 }
 
 #player-lists {
