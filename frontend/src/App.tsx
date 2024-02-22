@@ -123,7 +123,7 @@ const Board = ({ }: any) => {
 	}
 
 	useEffect(() => {
-		if (reset) resetGame
+		if (reset) resetGame()
 	}, [reset, setReset, setWinner, winner])
 
 	useEffect(() => {
@@ -226,7 +226,7 @@ const Board = ({ }: any) => {
 					</div>
 				))}
 			</div>
-			<Players players={players} />
+			<Players players={players} resetGame={resetGame} />
 		</div>
 	)
 }
@@ -295,9 +295,10 @@ const PlayersLists = () => {
 	</>
 }
 
-const Players = ({ players }: { players: Players }) => {
+const Players = ({ players, resetGame }: any) => {
+	const navigate = useNavigate()
 	return (
-		<div>
+		<div style={{ display: 'grid', gap: 5 }}>
 			<div className='players' style={{ marginBottom: 10 }}>
 				<div className='player' style={{ display: 'grid' }}>
 					<p style={{ marginTop: 0, marginBottom: 8 }}>{`${players?.player1?.name}: X`}</p>
@@ -327,9 +328,19 @@ const Players = ({ players }: { players: Players }) => {
 					Draw: {players?.draw ?? 0}
 				</div>
 			</div>
-			<div style={{ outline: '1px solid red', }}>
-				<button>Stop Game</button>
-				<button>Reset Game</button>
+			<div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+				<button onClick={() => {
+					if (confirm('Are you sure you want to stop the current game?')) {
+						localStorage.clear()
+						navigate('/')
+					}
+				}}>Stop Game</button>
+				<button onClick={resetGame}>Restart Game</button>
+				<button onClick={() => {
+					if (confirm('Are you sure you want to clear game data?')) {
+
+					}
+				}}>Clear Game Record</button>
 			</div>
 		</div>
 	)
