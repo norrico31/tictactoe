@@ -188,65 +188,16 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 				if (current === "X") {
 					setWinner(`${players?.player1.name} wins`)
 					updateMatchPlayer(id, 'player1')
-					// setPlayers({
-					// 	player1: {
-					// 		name: players?.player1.name,
-					// 		score: {
-					// 			...players?.player1.score,
-					// 			win: players?.player1.score.win + 1,
-					// 		}
-					// 	},
-					// 	player2: {
-					// 		...players?.player2,
-					// 		score: {
-					// 			...players?.player2.score,
-					// 			lose: players?.player2.score.lose + 1,
-					// 		}
-					// 	},
-					// })
 					return
 				} else {
 					setWinner(`${players?.player2.name} wins`)
 					updateMatchPlayer(id, 'player2')
-
-					// setPlayers({
-					// 	player1: {
-					// 		name: players?.player2.name,
-					// 		score: {
-					// 			...players?.player1.score,
-					// 			lose: players?.player1.score.lose + 1,
-					// 		}
-					// 	},
-					// 	player2: {
-					// 		...players?.player2,
-					// 		score: {
-					// 			...players?.player2.score,
-					// 			win: players?.player2.score.win + 1,
-					// 		}
-					// 	},
-					// })
 					return
 				}
 			}
 			if (checkDraw(board)) {
 				setWinner("Draw")
 				updateMatchPlayer(id, 'draw')
-				// setPlayers({
-				// 	player1: {
-				// 		name: players?.player2?.name,
-				// 		score: {
-				// 			...players?.player1.score,
-				// 			// draw: players?.player1.score.draw + 1
-				// 		}
-				// 	},
-				// 	player2: {
-				// 		...players.player2,
-				// 		score: {
-				// 			...players.player2.score,
-				// 			// draw: players.player2.score.draw + 1
-				// 		}
-				// 	},
-				// })
 			}
 		}
 	}
@@ -282,7 +233,12 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 
 	return (
 		<div className="App">
-			<h1 style={{ fontSize: 60 }}>Round: {players?.rounds}</h1>
+			<div style={{ marginRight: 'auto' }}>
+				<Link to='/' style={{ fontSize: 24, color: '#525252', paddingLeft: 20 }}>Back to scoring board</Link>
+			</div>
+			<div >
+				<h1 style={{ fontSize: 60 }}>Round: {players?.rounds}</h1>
+			</div>
 			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
 				<div className="winner-text">{winner}</div>
 				<button onClick={resetGame}>Reset</button>
@@ -319,7 +275,7 @@ const PlayersLists = () => {
 	}, [])
 
 	return <>
-		<h1 style={{ color: '#525252', textAlign: 'center' }}>Tic Tac Toe Scoring Board</h1>
+		<h1 style={{ color: '#525252', textAlign: 'center', marginTop: 0, paddingTop: 20 }}>Tic Tac Toe Scoring Board</h1>
 		<div style={{ textAlign: 'right', padding: 10 }}>
 			<Link to='/register' style={{ fontSize: 32, fontWeight: 'bold', color: '#525252' }}>Play Game</Link>
 		</div >
@@ -389,11 +345,12 @@ const Players = ({ players }: { players: Players }) => {
 					</div>
 				</div>
 			</div>
-			<div style={{ display: 'grid', placeItems: 'center' }}>
+			<div style={{ display: 'grid', placeItems: 'center', marginBottom: 0 }}>
 				<div className="player" style={{ width: '60%' }}>
 					Draw: {players?.draw ?? 0}
 				</div>
 			</div>
+
 		</div>
 	)
 }
