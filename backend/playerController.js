@@ -43,9 +43,8 @@ export const getAllPlayers = async (req, res) => {
 
 export const getPlayersById = async (req, res) => {
     try {
-        const res = await PlayerModel.findById(req.params.id)
-        console.log(res)
-        return res.status(200).json(res)
+        const data = await PlayerModel.findById(req.params.id)
+        return res.status(200).json(data)
     } catch (error) {
         return error
     }

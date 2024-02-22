@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 
 const playersSchema = new mongoose.Schema({
     rounds: Number,
+    draw: Number,
     player1: {
         name: String,
         score: {
             win: Number,
             lose: Number,
-            draw: Number,
         }
     },
     player2: {
@@ -16,7 +16,6 @@ const playersSchema = new mongoose.Schema({
         score: {
             win: Number,
             lose: Number,
-            draw: Number,
         }
     }
 }, {timestamps: true})

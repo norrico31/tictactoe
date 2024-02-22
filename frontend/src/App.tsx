@@ -35,7 +35,6 @@ function App() {
 				<Route path="/" element={<PlayersLists />} />
 				<Route path="/register" element={
 					<PlayersForm
-
 						players={players}
 						getPlayers={setPlayers}
 
@@ -44,9 +43,7 @@ function App() {
 					<Board
 						reset={reset}
 						setReset={setReset}
-						players={players}
 						winner={winner} setWinner={setWinner}
-						setPlayers={setPlayers}
 					/>} />
 			</Routes>
 			{/* {!players ?
@@ -135,15 +132,17 @@ const conditions = [
 	[3, 4, 5],
 	[6, 7, 8],
 	[0, 3, 6],
+
 	[1, 4, 7],
 	[2, 5, 8],
 	[0, 4, 8],
 	[2, 4, 6]
 ]
 
-const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any) => {
+const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 	const [data, setData] = useState(Array(9).fill(''))
 	const [current, setCurrent] = useState('X')
+	const [players, setPlayers] = useState<Players | undefined>(undefined)
 	const { id } = useParams()
 
 	if (!id) return <Navigate to='/register' />
@@ -164,15 +163,21 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 
 		(async () => {
 			try {
-				const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'GET' })
-				console.log(res)
+				const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'GET' }) as any
 				const data = await res.json()
-				// setPlayers(data)
+				if (!cleanUp) setPlayers(data)
+
+
 			} catch (error) {
 				return error
 			}
 		})()
+		return () => {
+			cleanUp = true
+		}
 	}, [id])
+
+	console.log(players)
 
 	const Draw = (index: number) => {
 		if (winner) return
@@ -188,63 +193,63 @@ const Board = ({ reset, setReset, winner, setWinner, players, setPlayers }: any)
 
 			if (checkWin(board)) {
 				if (current === "X") {
-					setWinner(`${players.player1.name} wins`)
-					setPlayers({
-						player1: {
-							name: players.player1.name,
-							score: {
-								...players.player1.score,
-								win: players.player1.score.win + 1,
-							}
-						},
-						player2: {
-							...players.player2,
-							score: {
-								...players.player2.score,
-								lose: players.player2.score.lose + 1,
-							}
-						},
-					})
+					setWinner(`${players?.player1.name} wins`)
+					// setPlayers({
+					// 	player1: {
+					// 		name: players?.player1.name,
+					// 		score: {
+					// 			...players?.player1.score,
+					// 			win: players?.player1.score.win + 1,
+					// 		}
+					// 	},
+					// 	player2: {
+					// 		...players?.player2,
+					// 		score: {
+					// 			...players?.player2.score,
+					// 			lose: players?.player2.score.lose + 1,
+					// 		}
+					// 	},
+					// })
 					return
 				} else {
-					setWinner(`${players.player2.name} wins`)
-					setPlayers({
-						player1: {
-							name: players.player2.name,
-							score: {
-								...players.player1.score,
-								lose: players.player1.score.lose + 1,
-							}
-						},
-						player2: {
-							...players.player2,
-							score: {
-								...players.player2.score,
-								win: players.player2.score.win + 1,
-							}
-						},
-					})
+					setWinner(`${players?.player2.name} wins`)
+					// setPlayers({
+					// 	player1: {
+					// 		name: players?.player2.name,
+					// 		score: {
+					// 			...players?.player1.score,
+					// 			lose: players?.player1.score.lose + 1,
+					// 		}
+					// 	},
+					// 	player2: {
+					// 		...players?.player2,
+					// 		score: {
+					// 			...players?.player2.score,
+					// 			win: players?.player2.score.win + 1,
+					// 		}
+					// 	},
+					// })
 					return
 				}
 			}
 			if (checkDraw(board)) {
 				setWinner("Draw")
-				setPlayers({
-					player1: {
-						name: players.player2.name,
-						score: {
-							...players.player1.score,
-							draw: players.player1.score.draw + 1
-						}
-					},
-					player2: {
-						...players.player2,
-						score: {
-							...players.player2.score,
-							draw: players.player2.score.draw + 1
-						}
-					},
-				})
+				// setPlayers({
+				// 	player1: {
+				// 		name: players?.player2?.name,
+				// 		score: {
+				// 			...players?.player1.score,
+				// 			// draw: players?.player1.score.draw + 1
+				// 		}
+				// 	},
+				// 	player2: {
+				// 		...players.player2,
+				// 		score: {
+				// 			...players.player2.score,
+				// 			// draw: players.player2.score.draw + 1
+				// 		}
+				// 	},
+				// })
 			}
 		}
 	}
@@ -314,7 +319,7 @@ const PlayersLists = () => {
 			cleanUp = true
 		}
 	}, [])
-	console.log(lists)
+
 	return <>
 		<h1 style={{ color: '#525252', textAlign: 'center' }}>Tic Tac Toe Scoring Board</h1>
 		<div style={{ textAlign: 'right', padding: 10 }}>
@@ -323,24 +328,32 @@ const PlayersLists = () => {
 		<table id="player-lists" style={{ textAlign: 'center' }}>
 			<thead >
 				<tr >
-					<th>Player 1</th>
-					<th>Player 2</th>
+					<th>Players</th>
 					<th>Rounds</th>
-					<th>Win</th>
-					<th>Lose</th>
+					<th>Score</th>
 					<th>Draw</th>
 					<th>Action</th>
 				</tr>
 			</thead>
+			<h2 style={{ textAlign: 'center' }}>
+				{!lists.length ? 'No players had played yet' : ''}
+			</h2>
 			<tbody>
 				{lists.map((player: Players) => (
 					<tr key={player?._id}>
-						<td>{player?.player1.name}</td>
-						<td>{player?.player2.name}</td>
-						<td>10</td>
-						<td>4</td>
-						<td>4</td>
-						<td>2</td>
+						<td>
+							{player?.player1.name} <br />
+							{player?.player2.name}
+						</td>
+						<td>{player?.rounds}</td>
+						<td>
+							Win: {player?.player1?.score?.win} {" "}
+							Lose: {player?.player1?.score?.lose}
+							<br />
+							Win: {player?.player2?.score?.win} {" "}
+							Lose: {player?.player2?.score?.lose}
+						</td>
+						<td>{player?.draw}</td>
 						<td >
 							<button onClick={() => alert('func for rematch')}>Rematch</button>
 						</td>
