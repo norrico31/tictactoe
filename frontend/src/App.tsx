@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import axios from "axios";
 
 const BASE_URL = `http://127.0.0.1:5000`
 
@@ -23,28 +22,12 @@ type Players = {
 } & Partial<{ _id: string; createdAt: string; updatedAt: string; rounds: number; draw: number }> | undefined
 
 function App() {
-	const [reset, setReset] = useState(false)
-	const [winner, setWinner] = useState('')
-	const [players, setPlayers] = useState<Players>(undefined)
-
-	const Reset = () => setReset(true)
-
 	return (
 		<Router basename="/" future={{ v7_startTransition: true }}>
 			<Routes>
 				<Route path="/" element={<PlayersLists />} />
-				<Route path="/register" element={
-					<PlayersForm
-						players={players}
-						getPlayers={setPlayers}
-
-					/>} />
-				<Route path="/playgame/:id" element={
-					<Board
-						reset={reset}
-						setReset={setReset}
-						winner={winner} setWinner={setWinner}
-					/>} />
+				<Route path="/register" element={<PlayersForm />} />
+				<Route path="/playgame/:id" element={<Board />} />
 			</Routes>
 		</Router>
 	);
@@ -53,12 +36,10 @@ function App() {
 const initNamesState = { player1: { name: '', score: { win: 0, lose: 0, draw: 0 } }, player2: { name: '', score: { win: 0, lose: 0, draw: 0 } } }
 const initErrorsState = { error1: '', error2: '' }
 
-function PlayersForm({ players }: { players: Players; getPlayers: React.Dispatch<React.SetStateAction<Players>> }) {
+function PlayersForm() {
 	const [names, setNames] = useState(initNamesState);
 	const [errors, setErrors] = useState(initErrorsState)
 	const navigate = useNavigate()
-
-	if (players) return <Navigate to='/playgame' />
 
 	const inputChange = (e: any) => setNames({ ...names, [e.target.name]: { name: e.target.value, score: { win: 0, lose: 0, draw: 0 } } })
 
@@ -117,25 +98,28 @@ const conditions = [
 	[3, 4, 5],
 	[6, 7, 8],
 	[0, 3, 6],
-
 	[1, 4, 7],
 	[2, 5, 8],
 	[0, 4, 8],
 	[2, 4, 6]
 ]
 
-const Board = ({ reset, setReset, winner, setWinner, }: any) => {
+const Board = ({ }: any) => {
+	const [reset, setReset] = useState(false)
 	const [data, setData] = useState(Array(9).fill(''))
 	const [current, setCurrent] = useState('X')
 	const [players, setPlayers] = useState<Players | undefined>(undefined)
+	const [loading, setLoading] = useState(true)
+	const [winner, setWinner] = useState('')
+	const navigate = useNavigate()
 	const { id } = useParams()
-
 	if (!id) return <Navigate to='/register' />
 
 	const resetGame = () => {
 		setData(Array(9).fill(''))
 		setWinner('')
 		setReset(false)
+		getMatchPlayer()
 	}
 
 	useEffect(() => {
@@ -151,24 +135,24 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 	}, [id])
 
 	async function getMatchPlayer(signal?: AbortSignal) {
+		setLoading(true)
 		try {
 			const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'GET', signal }) as any
 			const data = await res.json()
 			setPlayers(data)
-
-
 		} catch (error) {
 			return error
+		} finally {
+			setLoading(false)
 		}
 	}
+
 	async function updateMatchPlayer(id: string, winner: 'player1' | 'player2' | 'draw') {
 		try {
 			const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ winner }) }) as any
 			console.log('res from frontend: ', res)
 		} catch (error) {
 			return error
-		} finally {
-			getMatchPlayer()
 		}
 	}
 
@@ -216,32 +200,24 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 		}
 	}
 
-	const checkWin = (board: any) => {
-		let flag = false;
-		conditions.forEach(element => {
-			if (board[element[0]] !== ""
-				&& board[element[1]] !== "" &&
-				board[element[2]] !== "") {
-				if (board[element[0]] === board[element[1]] &&
-					board[element[1]] === board[element[2]]) {
-					flag = true;
-				}
-			}
-		})
-		return flag;
-	}
-
 	return (
 		<div className="App">
 			<div style={{ marginRight: 'auto' }}>
 				<Link to='/' style={{ fontSize: 24, color: '#525252', paddingLeft: 20 }}>Back to scoring board</Link>
 			</div>
 			<div >
-				<h1 style={{ fontSize: 60 }}>Round: {players?.rounds}</h1>
+				<h1 style={{ fontSize: 60 }}>Round: {players?.rounds == 0 ? 1 : players?.rounds}</h1>
 			</div>
 			<div className={`winner ${winner !== "" ? "" : "shrink"}`}>
 				<div className="winner-text">{winner}</div>
-				<button onClick={resetGame}>Reset</button>
+				<button onClick={() => {
+					if (loading) return
+					resetGame()
+				}}>Next Round</button>
+				<button onClick={() => {
+					localStorage.clear()
+					navigate('/')
+				}}>Stop Game</button>
 			</div>
 			<div className='board'>
 				{new Array(9).fill(undefined).map((_, idx) => (
@@ -256,6 +232,7 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 }
 
 const PlayersLists = () => {
+	const navigate = useNavigate()
 	const [lists, setLists] = useState<Players[]>([])
 	useEffect(() => {
 		let cleanUp = false;
@@ -273,18 +250,18 @@ const PlayersLists = () => {
 			cleanUp = true
 		}
 	}, [])
-
+	const iDFromLocalStorage = JSON.parse(localStorage.getItem('id')!)
 	return <>
 		<h1 style={{ color: '#525252', textAlign: 'center', marginTop: 0, paddingTop: 20 }}>Tic Tac Toe Scoring Board</h1>
-		<div style={{ textAlign: 'right', padding: 10 }}>
-			<Link to='/register' style={{ fontSize: 32, fontWeight: 'bold', color: '#525252' }}>Play Game</Link>
+		<div style={{ textAlign: 'center', padding: 10 }}>
+			<Link to={iDFromLocalStorage ? '/playgame/' + iDFromLocalStorage : '/register'} style={{ fontSize: 32, fontWeight: 'bold', color: '#525252' }}>{iDFromLocalStorage ? 'Continue Game' : 'Play Game'}</Link>
 		</div >
 		<table id="player-lists" style={{ textAlign: 'center' }}>
 			<thead >
 				<tr >
 					<th>Players</th>
-					<th>Rounds</th>
 					<th>Score</th>
+					<th>Rounds</th>
 					<th>Draw</th>
 					<th>Action</th>
 				</tr>
@@ -299,7 +276,6 @@ const PlayersLists = () => {
 							{player?.player1.name} <br />
 							{player?.player2.name}
 						</td>
-						<td>{player?.rounds}</td>
 						<td>
 							Win: {player?.player1?.score?.win} {" "}
 							Lose: {player?.player1?.score?.lose}
@@ -307,9 +283,10 @@ const PlayersLists = () => {
 							Win: {player?.player2?.score?.win} {" "}
 							Lose: {player?.player2?.score?.lose}
 						</td>
+						<td>{player?.rounds}</td>
 						<td>{player?.draw}</td>
 						<td >
-							<button onClick={() => alert('func for rematch')}>Rematch</button>
+							<button onClick={() => navigate('/playgame/' + player?._id)}>Rematch</button>
 						</td>
 					</tr>
 				))}
@@ -350,9 +327,27 @@ const Players = ({ players }: { players: Players }) => {
 					Draw: {players?.draw ?? 0}
 				</div>
 			</div>
-
+			<div style={{ outline: '1px solid red', }}>
+				<button>Stop Game</button>
+				<button>Reset Game</button>
+			</div>
 		</div>
 	)
 }
 
 export default App;
+
+const checkWin = (board: any) => {
+	let flag = false;
+	conditions.forEach((element: any) => {
+		if (board[element[0]] !== ""
+			&& board[element[1]] !== "" &&
+			board[element[2]] !== "") {
+			if (board[element[0]] === board[element[1]] &&
+				board[element[1]] === board[element[2]]) {
+				flag = true;
+			}
+		}
+	})
+	return flag;
+}
