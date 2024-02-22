@@ -16,7 +16,7 @@ export const createPlayers = async (req, res) => {
                 }
             },
             player2: {
-                name: player1,
+                name: player2,
                 score: {
                     win: 0,
                     lose: 0,
@@ -34,7 +34,6 @@ export const createPlayers = async (req, res) => {
 export const getAllPlayers = async (req, res) => {
     try {
         const players = await PlayerModel.find({})
-        console.log(players)
         return res.status(200).json(players)
     } catch (error) {
         return error
@@ -52,8 +51,95 @@ export const getPlayersById = async (req, res) => {
 
 export const updatePlayers = async (req, res) => {
     try {
-        
+        const winner = req.body.winner;
+        const id = req.params.id
+        const existingGamePlay = await PlayerModel.findById(id)
+        // let payload = roundWinner(winner, existingGamePlay)
+        // existingGamePlay.markModified('player')
+        if (winner === 'player1') {
+            console.log('player1')
+            existingGamePlay.rounds = existingGamePlay.rounds +1;
+            existingGamePlay.draw = existingGamePlay.draw;
+            existingGamePlay.player1.name = existingGamePlay.player1.name;
+            existingGamePlay.player1.score.win = existingGamePlay.player1.score.win + 1;
+            existingGamePlay.player1.score.lose = existingGamePlay.player1.score.lose;
+
+            existingGamePlay.player2.name = existingGamePlay.player2.name;
+            existingGamePlay.player2.score.win = existingGamePlay.player2.score.win;
+            existingGamePlay.player2.score.lose = existingGamePlay.player2.score.lose === 0 ? 0 : (existingGamePlay.player2.score.lose + 1);
+        }
+        else if (winner === 'player2') {
+            console.log('player2')
+            existingGamePlay.rounds = existingGamePlay.rounds +1;
+            existingGamePlay.draw = existingGamePlay.draw;
+            existingGamePlay.player1.name = existingGamePlay.player1.name;
+            existingGamePlay.player1.score.win = existingGamePlay.player1.score.win;
+            existingGamePlay.player1.score.lose = existingGamePlay.player1.score.lose === 0 ? 0 : existingGamePlay.player1.score.lose;
+            
+            existingGamePlay.player2.name = existingGamePlay.player2.name;
+            existingGamePlay.player2.score.win = existingGamePlay.player2.score.win + 1;
+            existingGamePlay.player2.score.lose = existingGamePlay.player2.score.lose;
+        } else {
+            console.log('draw')
+            existingGamePlay.rounds = existingGamePlay.rounds +1;
+            existingGamePlay.draw = existingGamePlay.draw + 1;
+
+        }
+        await existingGamePlay.save()
+        console.log('res: ', existingGamePlay)
+        return res.json(existingGamePlay)
     } catch (error) {
             return error
+    }
+}
+
+function roundWinner(winner, existingGamePlay) {
+    switch (winner) {
+        case 'player1': 
+            return {
+                draw: existingGamePlay.draw,
+                rounds: existingGamePlay.rounds + 1,
+                player1: {
+                    name: existingGamePlay.player1.name,
+                    score: {
+                        lose: existingGamePlay.player1.score.lose,
+                        win: existingGamePlay.player1.score.win + 1
+                    }
+                },
+                player2: {
+                    name: existingGamePlay.player2.name,
+                    score: {
+                        lose: existingGamePlay.player2.score.lose === 0 ? 0 : (existingGamePlay.player2.score.lose + 1),
+                        win: existingGamePlay.player2.score.win
+                    }
+                },
+            }
+        case 'player2':
+                return {
+                    draw: existingGamePlay.draw,
+                    rounds: existingGamePlay.rounds + 1,
+                    player1: {
+                    name: existingGamePlay.player1.name,
+                    score: {
+                        lose: existingGamePlay.player1.score.lose === 0 ? 0 : (existingGamePlay.player1.score.lose + 1),
+                        win: existingGamePlay.player1.score.win + 1
+                    }
+                    },
+                    player2: {
+                        name: existingGamePlay.player2.name,
+                        score: {
+                            lose: existingGamePlay.player2.score.lose,
+                            win: existingGamePlay.player2.score.win + 1
+                        }
+                    },
+                }
+        case 'draw': 
+                return {
+                    ...existingGamePlay,
+                    rounds: existingGamePlay.rounds + 1,
+                    draw: existingGamePlay.draw + 1,
+                }
+        default: winner
+                
     }
 }

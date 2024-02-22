@@ -149,7 +149,6 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 
 	const resetGame = () => {
 		setData(Array(9).fill(''))
-		console.log(winner)
 		setWinner('')
 		setReset(false)
 	}
@@ -159,25 +158,34 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 	}, [reset, setReset, setWinner, winner])
 
 	useEffect(() => {
-		let cleanUp = false;
-
-		(async () => {
-			try {
-				const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'GET' }) as any
-				const data = await res.json()
-				if (!cleanUp) setPlayers(data)
-
-
-			} catch (error) {
-				return error
-			}
-		})()
+		const controller = new AbortController();
+		getMatchPlayer(controller.signal)
 		return () => {
-			cleanUp = true
+			controller.abort()
 		}
 	}, [id])
 
-	console.log(players)
+	async function getMatchPlayer(signal?: AbortSignal) {
+		try {
+			const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'GET', signal }) as any
+			const data = await res.json()
+			setPlayers(data)
+
+
+		} catch (error) {
+			return error
+		}
+	}
+	async function updateMatchPlayer(id: string, winner: 'player1' | 'player2' | 'draw') {
+		try {
+			const res = await fetch(`${BASE_URL}/api/players/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ winner }) }) as any
+			console.log('res from frontend: ', res)
+		} catch (error) {
+			return error
+		} finally {
+			getMatchPlayer()
+		}
+	}
 
 	const Draw = (index: number) => {
 		if (winner) return
@@ -194,6 +202,7 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 			if (checkWin(board)) {
 				if (current === "X") {
 					setWinner(`${players?.player1.name} wins`)
+					updateMatchPlayer(id, 'player1')
 					// setPlayers({
 					// 	player1: {
 					// 		name: players?.player1.name,
@@ -213,6 +222,8 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 					return
 				} else {
 					setWinner(`${players?.player2.name} wins`)
+					updateMatchPlayer(id, 'player2')
+
 					// setPlayers({
 					// 	player1: {
 					// 		name: players?.player2.name,
@@ -234,6 +245,7 @@ const Board = ({ reset, setReset, winner, setWinner, }: any) => {
 			}
 			if (checkDraw(board)) {
 				setWinner("Draw")
+				updateMatchPlayer(id, 'draw')
 				// setPlayers({
 				// 	player1: {
 				// 		name: players?.player2?.name,
@@ -359,11 +371,6 @@ const PlayersLists = () => {
 						</td>
 					</tr>
 				))}
-				<tr>
-					{/* <td>Berglunds snabbköp</td>
-					<td>Christina Berglund</td>
-					<td>Sweden</td> */}
-				</tr>
 			</tbody>
 		</table>
 	</>
